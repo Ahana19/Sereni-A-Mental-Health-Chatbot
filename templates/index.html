@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sereni - Chatbot</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #a8edea, #fed6e3);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .main-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .side-image {
+            position: absolute;
+            top: 0;
+            width: 25%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .left { left: 0; background-image: url("{{ url_for('static', filename='left.jpeg') }}"); }
+        .right { right: 0; background-image: url("{{ url_for('static', filename='right.jpeg') }}"); }
+
+        .chat-container {
+            width: 50%;
+            max-width: 450px;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+
+        .chat-header { text-align: center; font-size: 18px; font-weight: bold; color: #333; }
+        .chat-subtext { text-align: center; font-size: 14px; color: #666; margin-bottom: 10px; }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 10px;
+        }
+
+        .chat-bubble {
+            padding: 10px;
+            border-radius: 15px;
+            margin: 5px;
+            max-width: 75%;
+            font-size: 16px;
+            word-wrap: break-word;
+        }
+
+        .user-bubble { background-color: #25D366; color: white; align-self: flex-end; text-align: right; }
+        .bot-bubble { background-color: #E4E6EB; color: black; align-self: flex-start; }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        button {
+            padding: 9px 17px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .send-btn { background-color: #007bff; color: white; }
+        .clear-btn { background-color: #dc3545; color: white; }
+        .book-btn { background-color: #28a745; color: white; }
+
+        @media (max-width: 768px) {
+            .side-image { display: none; }
+            .chat-container { width: 90%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="side-image left"></div>
+        <div class="chat-container">
+            <div class="chat-header">💬🤖 Sereni - Your Personal Mental Health Chatbot</div>
+            <div class="chat-subtext">You can share anything with me. This is a safe space ❤️</div>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="input-container">
+                <input type="text" id="user-input" placeholder="Type your message..." required>
+                <button onclick="sendMessage()" class="send-btn">Send</button>
+                <button onclick="clearChat()" class="clear-btn">Clear</button>
+                <button onclick="bookAppointment()" class="book-btn">Book</button>
+            </div>
+        </div>
+        <div class="side-image right"></div>
+    </div>
+
+    <script>
+        document.getElementById("user-input").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+
+        async function sendMessage() {
+            const userInput = document.getElementById("user-input").value;
+            if (!userInput.trim()) return;
+
+            const chatMessages = document.getElementById("chat-messages");
+            chatMessages.innerHTML += `<div class='chat-bubble user-bubble'>${userInput}</div>`;
+            document.getElementById("user-input").value = "";
+
+            const response = await fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: userInput })
+            });
+            const data = await response.json();
+
+            chatMessages.innerHTML += `<div class='chat-bubble bot-bubble'>${data.response}</div>`;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function clearChat() {
+            await fetch("/clear", { method: "POST" });
+            document.getElementById("chat-messages").innerHTML = "";
+        }
+
+        function bookAppointment() {
+            const chatMessages = document.getElementById("chat-messages");
+            chatMessages.innerHTML += `<div class='chat-bubble user-bubble'>I want to book an appointment</div>`;
+
+            setTimeout(() => {
+                chatMessages.innerHTML += `<div class='chat-bubble bot-bubble'>Sure! You can book an appointment using the following link: <a href='https://docvita.com/therapists' target='_blank'>Book Now</a></div>`;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 500);
+        }
+    </script>
+</body>
+</html>
