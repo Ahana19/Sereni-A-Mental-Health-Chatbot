@@ -6,7 +6,7 @@ Sereni is an AI-powered mental health chatbot designed to provide empathetic con
 
 ### Features
 
-- Conversational AI powered by [Mistral-7B](https://huggingface.co/mistralai/Mistral-7B), enabling natural and meaningful interactions.
+- Conversational AI powered by [Mistral-7B](https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.1-GGUF), enabling natural and meaningful interactions.
 - Sentiment detection that identifies emotional states such as sadness, anxiety, and stress, ensuring appropriate responses.
 - Direct therapist booking through [DocVita](https://docvita.com), allowing users to connect with licensed professionals.
 - Privacy-focused architecture that ensures confidential conversations without storing user data.
